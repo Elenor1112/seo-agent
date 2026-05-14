@@ -1,0 +1,63 @@
+# Web framework
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+
+# Async DB
+sqlalchemy[asyncio]==2.0.30
+asyncpg==0.29.0
+alembic==1.13.1
+
+# Redis / Celery
+celery[redis]==5.4.0
+redis==5.0.4
+flower==2.0.1
+
+# HTTP clients
+httpx==0.27.0
+aiohttp==3.9.5
+
+# Crawling
+playwright==1.44.0
+beautifulsoup4==4.12.3
+lxml==5.2.2
+extruct==0.17.0
+
+# Data / NLP
+pandas==2.2.2
+numpy==1.26.4
+scikit-learn==1.5.0
+sentence-transformers==3.0.1
+tiktoken==0.7.0
+
+# Google APIs
+google-auth==2.29.0
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.131.0
+
+# LLM
+
+
+# Storage (S3-compatible) — pinned to a compatible trio
+boto3==1.33.13
+aioboto3==12.3.0
+botocore==1.33.13
+
+# ClickHouse
+clickhouse-connect==0.7.12
+
+# Auth & security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Config
+pydantic==2.7.1
+pydantic-settings==2.3.0
+python-dotenv==1.0.1
+
+# Utilities
+tenacity==8.3.0
+structlog==24.2.0
+rich==13.7.1
+python-slugify==8.0.4

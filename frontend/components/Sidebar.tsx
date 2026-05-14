@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { BarChart2, Globe, FileText, Search, Settings, Zap, Activity } from 'lucide-react'
+import { BarChart2, Globe, FileText, Search, Settings, Zap, Activity, Gauge } from 'lucide-react'
 import clsx from 'clsx'
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { href: '/projects', label: 'Projects', icon: Globe },
   { href: '/keywords', label: 'Keywords', icon: Search },
   { href: '/content', label: 'Content', icon: FileText },
+  { href: '/speed', label: 'Speed Audit', icon: Gauge },
   { href: '/analytics', label: 'Analytics', icon: Activity },
   { href: '/jobs', label: 'Jobs', icon: Zap },
   { href: '/settings', label: 'Settings', icon: Settings },

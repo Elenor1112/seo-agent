@@ -41,6 +41,7 @@ class TaskType(str, enum.Enum):
     content_optimize = "content_optimize"
     track_performance = "track_performance"
     feedback_loop = "feedback_loop"
+    speed_audit = "speed_audit"
 
 
 class ContentStatus(str, enum.Enum):
@@ -93,6 +94,8 @@ class Project(Base):
     keywords: Mapped[list["Keyword"]] = relationship(back_populates="project", cascade="all, delete-orphan")
     tasks: Mapped[list["Task"]] = relationship(back_populates="project", cascade="all, delete-orphan")
     content_versions: Mapped[list["ContentVersion"]] = relationship(back_populates="project")
+    speed_audits: Mapped[list["SpeedAudit"]] = relationship(back_populates="project", cascade="all, delete-orphan")
+    scores: Mapped[list["ProjectScore"]] = relationship(back_populates="project", cascade="all, delete-orphan")
 
 
 class Page(Base):
@@ -304,3 +307,73 @@ class Task(Base):
 
     project: Mapped["Project"] = relationship(back_populates="tasks")
     subtasks: Mapped[list["Task"]] = relationship("Task")
+
+
+# ── Speed Audit Models ────────────────────────────────────────────────────────
+
+class SpeedAudit(Base):
+    """Speed audit results from Lighthouse/PageSpeed Insights."""
+    __tablename__ = "speed_audits"
+    __table_args__ = (
+        Index("ix_speed_audits_project_created", "project_id", "created_at"),
+        Index("ix_speed_audits_page", "page_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"))
+    page_id: Mapped[Optional[uuid.UUID]] = mapped_column(UUID(as_uuid=True), ForeignKey("pages.id", ondelete="SET NULL"))
+
+    # Category scores (0-100)
+    performance_score: Mapped[float] = mapped_column(Float, nullable=False)
+    seo_score: Mapped[float] = mapped_column(Float, nullable=False)
+    accessibility_score: Mapped[float] = mapped_column(Float, nullable=False)
+    best_practices_score: Mapped[float] = mapped_column(Float, nullable=False)
+
+    # Core Web Vitals
+    lcp: Mapped[float] = mapped_column(Float, nullable=False)  # Largest Contentful Paint (seconds)
+    cls: Mapped[float] = mapped_column(Float, nullable=False)  # Cumulative Layout Shift
+    inp: Mapped[float] = mapped_column(Float, nullable=False)  # Interaction to Next Paint (seconds)
+    ttfb: Mapped[float] = mapped_column(Float, nullable=False)  # Time to First Byte (seconds)
+    total_blocking_time: Mapped[float] = mapped_column(Float, nullable=False)  # TBT (seconds)
+
+    # Recommendations
+    recommendations: Mapped[list] = mapped_column(JSONB, default=list)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    project: Mapped["Project"] = relationship(back_populates="speed_audits")
+    page: Mapped[Optional["Page"]] = relationship()
+
+
+# ── SEO Rating Models ─────────────────────────────────────────────────────────
+
+class ProjectScore(Base):
+    """Overall SEO score and category breakdown for a project."""
+    __tablename__ = "project_scores"
+    __table_args__ = (
+        Index("ix_project_scores_project_created", "project_id", "created_at"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"))
+
+    # Overall score (0-100)
+    overall_score: Mapped[float] = mapped_column(Float, nullable=False)
+
+    # Category scores (0-100)
+    technical_score: Mapped[float] = mapped_column(Float, nullable=False)
+    speed_score: Mapped[float] = mapped_column(Float, nullable=False)
+    content_score: Mapped[float] = mapped_column(Float, nullable=False)
+    keyword_score: Mapped[float] = mapped_column(Float, nullable=False)
+    schema_score: Mapped[float] = mapped_column(Float, nullable=False)
+    backlink_score: Mapped[float] = mapped_column(Float, nullable=False)
+
+    # Letter grade (A, B, C, D, F)
+    grade: Mapped[str] = mapped_column(String(2), nullable=False)
+
+    # Recommendations
+    recommendations: Mapped[list] = mapped_column(JSONB, default=list)
+
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    project: Mapped["Project"] = relationship(back_populates="scores")

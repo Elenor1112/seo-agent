@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import projects, tasks, keywords, content, analytics, auth, wordpress
+from api.routers import projects, tasks, keywords, content, analytics, auth, wordpress, speed, export, ratings
 from core.config import settings
 from core.logging import setup_logging
 from db.session import engine
@@ -51,6 +51,9 @@ app.include_router(keywords.router, prefix="/api/v1/keywords", tags=["keywords"]
 app.include_router(content.router, prefix="/api/v1/content", tags=["content"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["analytics"])
 app.include_router(wordpress.router, prefix="/api/v1/wordpress", tags=["wordpress"])
+app.include_router(speed.router, prefix="/api/v1/speed", tags=["speed"])
+app.include_router(export.router, prefix="/api/v1", tags=["export"])
+app.include_router(ratings.router, prefix="/api/v1", tags=["ratings"])
 
 
 @app.get("/health")
